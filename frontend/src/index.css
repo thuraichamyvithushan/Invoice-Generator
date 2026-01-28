@@ -5,25 +5,24 @@
     --color-secondary: #000000;
     --font-inter: "Inter", system-ui, sans-serif;
 
-    --color-surface-100: #ffffff;
-    --color-surface-200: #f1f5f9;
-    --color-content-100: #020617;
-    --color-content-200: #475569;
-    --color-outline: #e2e8f0;
+    /* Image-Matched Dark Theme Palette */
+    --color-surface-100: #000000;
+    --color-surface-200: #0a0a0b;
+    --color-surface-300: #161618;
+    --color-content-100: #ffffff;
+    --color-content-200: #a1a1aa;
+    --color-outline: #1f1f1f;
 
+    /* Compatibility aliases */
     --color-dark-surface-100: #000000;
-    --color-dark-surface-200: #1e1e20;
+    --color-dark-surface-200: #0a0a0b;
     --color-dark-content-100: #ffffff;
     --color-dark-content-200: #a1a1aa;
-    --color-dark-outline: #2d2d30;
+    --color-dark-outline: #1f1f1f;
 }
 
 body {
-    @apply bg-surface-100 text-content-100 font-inter transition-colors duration-300;
-}
-
-.dark body {
-    @apply bg-dark-surface-100 text-dark-content-100;
+    @apply bg-surface-100 text-content-100 font-inter transition-all duration-300;
 }
 
 @layer base {
@@ -31,12 +30,12 @@ body {
     input,
     textarea,
     select {
-        @apply bg-transparent border-outline text-content-100 dark:text-white rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all;
+        @apply bg-surface-200/50 border-outline text-content-100 rounded-xl focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all backdrop-blur-sm;
     }
 }
 
 .glass {
-    @apply bg-white/70 dark:bg-zinc-900/70 backdrop-blur-md border border-white/20 dark:border-zinc-800/30;
+    @apply bg-surface-200/80 backdrop-blur-xl border border-outline hover:border-slate-800 transition-all duration-300;
 }
 
 .no-print {

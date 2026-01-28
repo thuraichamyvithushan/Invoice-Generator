@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LogOut, FileText, PlusCircle, LayoutDashboard, Moon, Sun, Menu, X } from 'lucide-react';
+import { LogOut, FileText, PlusCircle, LayoutDashboard, Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../utils/utils';
 import logo from "../assets/logo/iTek_logo.png";
@@ -10,18 +10,7 @@ const Navbar = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
-    const [isDark, setIsDark] = useState(() => localStorage.getItem('theme') === 'dark');
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-    useEffect(() => {
-        if (isDark) {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('theme', 'dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('theme', 'light');
-        }
-    }, [isDark]);
 
     const handleLogout = () => {
         logout();
@@ -36,7 +25,7 @@ const Navbar = () => {
     ];
 
     return (
-        <nav className="sticky top-0 z-50 glass border-b border-white/20 dark:border-slate-800/50">
+        <nav className="sticky top-0 z-50 glass border-b border-slate-800/50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-16">
                     <div className="flex items-center">
@@ -54,40 +43,36 @@ const Navbar = () => {
                         </Link>
 
                         <div className="hidden md:ml-10 md:flex md:space-x-4">
-                            {navItems.map((item) => (
-                                <Link
-                                    key={item.path}
-                                    to={item.path}
-                                    className={cn(
-                                        "flex items-center px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200",
-                                        location.pathname === item.path
-                                            ? "bg-primary/10 text-primary"
-                                            : "text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800/50"
-                                    )}
-                                >
-                                    <item.icon className="h-4 w-4 mr-2" />
-                                    {item.label}
-                                </Link>
-                            ))}
+                            {navItems.map((item) => {
+                                const isActive = location.pathname === item.path;
+                                return (
+                                    <Link
+                                        key={item.path}
+                                        to={item.path}
+                                        className={cn(
+                                            "flex items-center px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300",
+                                            isActive
+                                                ? "bg-primary/20 text-primary border border-primary/30 shadow-[0_0_15px_rgba(242,0,0,0.1)]"
+                                                : "text-slate-400 hover:text-white hover:bg-surface-300"
+                                        )}
+                                    >
+                                        <item.icon className="h-4 w-4 mr-2" />
+                                        {item.label}
+                                    </Link>
+                                );
+                            })}
                         </div>
                     </div>
 
                     <div className="flex items-center space-x-4">
-                        <button
-                            onClick={() => setIsDark(!isDark)}
-                            className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-600 dark:text-slate-400"
-                        >
-                            {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-                        </button>
-
-                        <div className="hidden md:flex items-center space-x-4 pl-4 border-l border-slate-200 dark:border-slate-800">
+                        <div className="hidden md:flex items-center space-x-4 border-l border-outline ml-4 pl-4">
                             <div className="flex flex-col items-end">
-                                <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">{user.companyProfile?.name || 'User'}</span>
-                                <span className="text-xs text-slate-500 dark:text-slate-400">{user.email}</span>
+                                <span className="text-sm font-bold text-white leading-none mb-1">{user.companyProfile?.name || 'User'}</span>
+                                <span className="text-[11px] text-slate-500 font-medium">{user.email}</span>
                             </div>
                             <button
                                 onClick={handleLogout}
-                                className="p-2 text-slate-500 hover:text-red-500 dark:text-slate-400 dark:hover:text-red-400 transition-colors"
+                                className="p-2 text-slate-500 hover:text-red-500 transition-colors"
                                 title="Logout"
                             >
                                 <LogOut className="h-5 w-5" />

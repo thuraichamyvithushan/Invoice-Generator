@@ -135,24 +135,24 @@ const InvoiceForm = () => {
         <Layout>
             <div className="space-y-6 pb-32">
                 {/* Sticky Header */}
-                <div className="sticky top-16 z-40 -mx-4 px-4 py-4 glass border-b border-white/20 dark:border-slate-800/50 mb-8 flex items-center justify-between">
+                <div className="sticky top-16 z-40 -mx-4 px-4 py-4 bg-surface-100/80 backdrop-blur-xl border-b border-outline mb-8 flex items-center justify-between">
                     <div className="flex items-center space-x-4">
-                        <button onClick={() => navigate('/')} className="p-2 glass hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
+                        <button onClick={() => navigate('/')} className="p-3 bg-surface-200 border border-outline hover:bg-surface-300 rounded-2xl transition-all">
                             <ArrowLeft className="h-5 w-5" />
                         </button>
                         <div>
-                            <h1 className="text-xl font-black text-slate-900 dark:text-white">{id ? 'Edit Invoice' : 'New Invoice'}</h1>
-                            <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">{formData.invoiceNumber}</p>
+                            <h1 className="text-2xl font-black text-white tracking-tight">{id ? 'Edit Invoice' : 'New Invoice'}</h1>
+                            <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">{formData.invoiceNumber}</p>
                         </div>
                     </div>
                     <div className="flex items-center space-x-3">
                         <button
                             onClick={handleSubmit}
                             disabled={loading}
-                            className="px-6 py-2.5 bg-primary hover:bg-red-700 text-white font-bold rounded-xl shadow-lg shadow-primary/30 transition-all flex items-center space-x-2 active:scale-95 disabled:opacity-50"
+                            className="px-8 py-3 bg-gradient-to-r from-primary to-red-700 hover:to-red-600 text-white font-black rounded-2xl shadow-xl shadow-primary/20 transition-all flex items-center space-x-2 active:scale-95 disabled:opacity-50"
                         >
                             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                            <span>{id ? 'Update' : 'Create'}</span>
+                            <span>{id ? 'UPDATE' : 'CREATE'}</span>
                         </button>
                     </div>
                 </div>
@@ -160,71 +160,83 @@ const InvoiceForm = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-8">
                         {/* General Info */}
-                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass p-6 rounded-3xl space-y-6">
-                            <div className="flex items-center space-x-2 text-primary">
+                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-surface-200 border border-outline p-8 rounded-[2rem] space-y-8">
+                            <div className="flex items-center space-x-3 text-primary">
                                 <FileText className="h-5 w-5" />
-                                <h3 className="font-black uppercase text-xs tracking-widest">General Information</h3>
+                                <h3 className="font-black uppercase text-[10px] tracking-[0.2em]">General Information</h3>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-slate-500 uppercase flex items-center gap-1.5"><Hash className="h-3 w-3" /> Invoice No</label>
+                                    <label className="text-[10px] font-black text-slate-500 uppercase flex items-center gap-1.5"><Hash className="h-3 w-3" /> Invoice No</label>
                                     <input
                                         type="text"
                                         required
-                                        className="w-full px-4 py-2.5 glass rounded-xl"
+                                        className="w-full px-4 py-3 bg-surface-100 border border-outline rounded-xl text-white font-bold outline-none focus:ring-2 focus:ring-primary/40"
                                         value={formData.invoiceNumber}
                                         onChange={(e) => handleInputChange('invoiceNumber', e.target.value)}
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-slate-500 uppercase flex items-center gap-1.5"><Calendar className="h-3 w-3" /> Date</label>
+                                    <label className="text-[10px] font-black text-slate-500 uppercase flex items-center gap-1.5"><Calendar className="h-3 w-3" /> Date</label>
                                     <input
                                         type="date"
                                         required
-                                        className="w-full px-4 py-2.5 glass rounded-xl"
+                                        className="w-full px-4 py-3 bg-surface-100 border border-outline rounded-xl text-white font-bold outline-none focus:ring-2 focus:ring-primary/40"
                                         value={formData.invoiceDate}
                                         onChange={(e) => handleInputChange('invoiceDate', e.target.value)}
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-slate-500 uppercase flex items-center gap-1.5"><Clock className="h-3 w-3" /> Due Date</label>
+                                    <label className="text-[10px] font-black text-slate-500 uppercase flex items-center gap-1.5"><Clock className="h-3 w-3" /> Due Date</label>
                                     <input
                                         type="date"
                                         required
-                                        className="w-full px-4 py-2.5 glass rounded-xl font-bold "
+                                        className="w-full px-4 py-3 bg-surface-100 border border-outline rounded-xl text-white font-bold outline-none focus:ring-2 focus:ring-primary/40"
                                         value={formData.dueDate}
                                         onChange={(e) => handleInputChange('dueDate', e.target.value)}
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-slate-500 uppercase flex items-center gap-1.5"><Hash className="h-3 w-3" /> ABN</label>
+                                    <label className="text-[10px] font-black text-slate-500 uppercase flex items-center gap-1.5"><Hash className="h-3 w-3" /> ABN</label>
                                     <input
                                         type="text"
                                         placeholder="e.g. 96 678 973 085"
-                                        className="w-full px-4 py-2.5 glass rounded-xl"
+                                        className="w-full px-4 py-3 bg-surface-100 border border-outline rounded-xl text-white font-bold outline-none focus:ring-2 focus:ring-primary/40"
                                         value={formData.companyDetails.abn}
                                         onChange={(e) => handleInputChange('abn', e.target.value, 'companyDetails')}
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-slate-500 uppercase flex items-center gap-1.5"><Hash className="h-3 w-3" /> Amount Enclosed</label>
+                                    <label className="text-[10px] font-black text-slate-500 uppercase flex items-center gap-1.5"><Hash className="h-3 w-3" /> Amount Enclosed</label>
                                     <input
                                         type="text"
-                                        placeholder="e.g. 96 678 973 085"
-                                        className="w-full px-4 py-2.5 glass rounded-xl"
+                                        placeholder="Enter amount"
+                                        className="w-full px-4 py-3 bg-surface-100 border border-outline rounded-xl text-white font-bold outline-none focus:ring-2 focus:ring-primary/40"
                                         value={formData.companyDetails.AmountEnclosed}
                                         onChange={(e) => handleInputChange('AmountEnclosed', e.target.value, 'companyDetails')}
                                     />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-slate-500 uppercase flex items-center gap-1.5"><Tag className="h-3 w-3" /> Status</label>
+                                    <select
+                                        className="w-full px-4 py-3 bg-surface-100 border border-outline rounded-xl text-white font-bold outline-none focus:ring-2 focus:ring-primary/40 appearance-none cursor-pointer"
+                                        value={formData.status}
+                                        onChange={(e) => handleInputChange('status', e.target.value)}
+                                    >
+                                        <option value="Draft">Draft</option>
+                                        <option value="Sent">Sent</option>
+                                        <option value="Paid">Paid</option>
+                                    </select>
                                 </div>
                             </div>
                         </motion.div>
 
                         {/* Line Items */}
-                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass rounded-3xl overflow-hidden">
-                            <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
-                                <div className="flex items-center space-x-2 text-primary">
+                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-surface-200 border border-outline rounded-[2rem] overflow-hidden">
+                            <div className="px-8 py-6 border-b border-outline flex justify-between items-center bg-surface-300/30">
+                                <div className="flex items-center space-x-3 text-primary">
                                     <Tag className="h-5 w-5" />
-                                    <h3 className="font-black uppercase text-xs tracking-widest">Line Items</h3>
+                                    <h3 className="font-black uppercase text-[10px] tracking-[0.2em]">Line Items</h3>
                                 </div>
                                 <button
                                     type="button"
@@ -242,7 +254,7 @@ const InvoiceForm = () => {
                                             initial={{ opacity: 0, x: -20 }}
                                             animate={{ opacity: 1, x: 0 }}
                                             exit={{ opacity: 0, scale: 0.95 }}
-                                            className="grid grid-cols-12 gap-4 items-end bg-slate-50/50 dark:bg-slate-800/20 p-4 rounded-2xl group"
+                                            className="grid grid-cols-12 gap-4 items-end bg-slate-800/20 p-4 rounded-2xl group"
                                         >
                                             <div className="col-span-12 md:col-span-6 space-y-2">
                                                 <label className="text-[10px] font-black text-slate-400 uppercase">Description</label>
@@ -250,7 +262,7 @@ const InvoiceForm = () => {
                                                     type="text"
                                                     required
                                                     placeholder="e.g. Graphic Design Services"
-                                                    className="w-full px-4 py-2 glass rounded-xl text-sm"
+                                                    className="w-full px-4 py-2 bg-surface-100 border border-outline rounded-xl text-sm text-white font-medium outline-none focus:ring-2 focus:ring-primary/40"
                                                     value={item.description}
                                                     onChange={(e) => handleItemChange(index, 'description', e.target.value)}
                                                 />
@@ -260,7 +272,7 @@ const InvoiceForm = () => {
                                                 <input
                                                     type="number"
                                                     required
-                                                    className="w-full px-4 py-2 glass rounded-xl text-sm text-center"
+                                                    className="w-full px-4 py-2 bg-surface-100 border border-outline rounded-xl text-sm text-center text-white font-medium outline-none focus:ring-2 focus:ring-primary/40"
                                                     value={item.quantity}
                                                     onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
                                                 />
@@ -271,7 +283,7 @@ const InvoiceForm = () => {
                                                     type="number"
                                                     required
                                                     step="0.01"
-                                                    className="w-full px-4 py-2 glass rounded-xl text-sm text-right"
+                                                    className="w-full px-4 py-2 bg-surface-100 border border-outline rounded-xl text-sm text-right text-white font-medium outline-none focus:ring-2 focus:ring-primary/40"
                                                     value={item.unitPrice}
                                                     onChange={(e) => handleItemChange(index, 'unitPrice', e.target.value)}
                                                 />
@@ -279,7 +291,7 @@ const InvoiceForm = () => {
                                             <div className="col-span-4 md:col-span-2 flex items-center justify-between pb-2 pl-2">
                                                 <div className="text-right">
                                                     <p className="text-[10px] font-black text-slate-400 uppercase">Total</p>
-                                                    <p className="text-sm font-black text-slate-900 dark:text-white">{formatCurrency(item.total)}</p>
+                                                    <p className="text-sm font-black text-white">{formatCurrency(item.total)}</p>
                                                 </div>
                                                 <button
                                                     type="button"
@@ -293,7 +305,7 @@ const InvoiceForm = () => {
                                     ))}
                                 </AnimatePresence>
 
-                                <div className="pt-6 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                                <div className="pt-6 border-t border-slate-800 flex justify-between items-center">
                                     <div className="flex items-center space-x-2 text-slate-400">
                                         <Calculator className="h-4 w-4" />
                                         <span className="text-xs font-bold uppercase tracking-widest">Total Calculation</span>
@@ -309,18 +321,18 @@ const InvoiceForm = () => {
 
                     <div className="space-y-8">
                         {/* Customer Details */}
-                        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="glass p-6 rounded-3xl space-y-6">
-                            <div className="flex items-center space-x-2 text-primary">
+                        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="bg-surface-200 border border-outline p-8 rounded-[2rem] space-y-8">
+                            <div className="flex items-center space-x-3 text-primary">
                                 <User className="h-5 w-5" />
-                                <h3 className="font-black uppercase text-xs tracking-widest">Customer Details</h3>
+                                <h3 className="font-black uppercase text-[10px] tracking-[0.2em]">Customer Details</h3>
                             </div>
-                            <div className="space-y-4">
+                            <div className="space-y-5">
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Client Name</label>
                                     <input
                                         type="text"
                                         required
-                                        className="w-full px-4 py-2.5 glass rounded-xl"
+                                        className="w-full px-4 py-3 bg-surface-100 border border-outline rounded-xl text-white font-bold outline-none focus:ring-2 focus:ring-primary/40"
                                         placeholder="Enter customer name"
                                         value={formData.customerDetails.name}
                                         onChange={(e) => handleInputChange('name', e.target.value, 'customerDetails')}
@@ -329,8 +341,8 @@ const InvoiceForm = () => {
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Client Address</label>
                                     <textarea
-                                        rows="3"
-                                        className="w-full px-4 py-2.5 glass rounded-xl"
+                                        rows="2"
+                                        className="w-full px-4 py-3 bg-surface-100 border border-outline rounded-xl text-white font-bold outline-none focus:ring-2 focus:ring-primary/40"
                                         placeholder="Enter customer address"
                                         value={formData.customerDetails.address}
                                         onChange={(e) => handleInputChange('address', e.target.value, 'customerDetails')}
@@ -338,8 +350,9 @@ const InvoiceForm = () => {
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Client Email</label>
-                                    <textarea
-                                        className="w-full px-4 py-2.5 glass rounded-xl"
+                                    <input
+                                        type="email"
+                                        className="w-full px-4 py-3 bg-surface-100 border border-outline rounded-xl text-white font-bold outline-none focus:ring-2 focus:ring-primary/40"
                                         placeholder="Enter customer email"
                                         value={formData.customerDetails.email}
                                         onChange={(e) => handleInputChange('email', e.target.value, 'customerDetails')}
@@ -347,8 +360,9 @@ const InvoiceForm = () => {
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Client Phone_NO</label>
-                                    <textarea
-                                        className="w-full px-4 py-2.5 glass rounded-xl"
+                                    <input
+                                        type="text"
+                                        className="w-full px-4 py-3 bg-surface-100 border border-outline rounded-xl text-white font-bold outline-none focus:ring-2 focus:ring-primary/40"
                                         placeholder="Enter customer phone"
                                         value={formData.customerDetails.phone}
                                         onChange={(e) => handleInputChange('phone', e.target.value, 'customerDetails')}
@@ -356,8 +370,9 @@ const InvoiceForm = () => {
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Client Website</label>
-                                    <textarea
-                                        className="w-full px-4 py-2.5 glass rounded-xl"
+                                    <input
+                                        type="text"
+                                        className="w-full px-4 py-3 bg-surface-100 border border-outline rounded-xl text-white font-bold outline-none focus:ring-2 focus:ring-primary/40"
                                         placeholder="Enter customer Website"
                                         value={formData.customerDetails.website}
                                         onChange={(e) => handleInputChange('website', e.target.value, 'customerDetails')}
@@ -367,17 +382,17 @@ const InvoiceForm = () => {
                         </motion.div>
 
                         {/* Payment Info */}
-                        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="glass p-6 rounded-3xl space-y-6">
-                            <div className="flex items-center space-x-2 text-primary">
+                        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="bg-surface-200 border border-outline p-8 rounded-[2rem] space-y-8">
+                            <div className="flex items-center space-x-3 text-primary">
                                 <Banknote className="h-5 w-5" />
-                                <h3 className="font-black uppercase text-xs tracking-widest">Payment Setup</h3>
+                                <h3 className="font-black uppercase text-[10px] tracking-[0.2em]">Payment Setup</h3>
                             </div>
-                            <div className="space-y-4">
+                            <div className="space-y-5">
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Bank Name</label>
                                     <input
                                         type="text"
-                                        className="w-full px-4 py-2.5 glass rounded-xl"
+                                        className="w-full px-4 py-3 bg-surface-100 border border-outline rounded-xl text-white font-bold outline-none focus:ring-2 focus:ring-primary/40"
                                         value={formData.paymentInstructions.bankName}
                                         onChange={(e) => handleInputChange('bankName', e.target.value, 'paymentInstructions')}
                                     />
@@ -387,7 +402,7 @@ const InvoiceForm = () => {
                                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">BSB</label>
                                         <input
                                             type="text"
-                                            className="w-full px-4 py-2.5 glass rounded-xl"
+                                            className="w-full px-4 py-3 bg-surface-100 border border-outline rounded-xl text-white font-bold outline-none focus:ring-2 focus:ring-primary/40"
                                             value={formData.paymentInstructions.bsb}
                                             onChange={(e) => handleInputChange('bsb', e.target.value, 'paymentInstructions')}
                                         />
@@ -396,7 +411,7 @@ const InvoiceForm = () => {
                                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Acc No</label>
                                         <input
                                             type="text"
-                                            className="w-full px-4 py-2.5 glass rounded-xl"
+                                            className="w-full px-4 py-3 bg-surface-100 border border-outline rounded-xl text-white font-bold outline-none focus:ring-2 focus:ring-primary/40"
                                             value={formData.paymentInstructions.accountNumber}
                                             onChange={(e) => handleInputChange('accountNumber', e.target.value, 'paymentInstructions')}
                                         />

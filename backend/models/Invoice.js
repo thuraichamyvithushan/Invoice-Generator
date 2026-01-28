@@ -37,7 +37,10 @@ const invoiceSchema = new mongoose.Schema({
     },
     customerDetails: {
         name: { type: String, required: true },
-        address: String
+        address: String,
+        email: String,
+        phone: String,
+        website: String
     },
     items: [invoiceItemSchema],
     subtotal: {

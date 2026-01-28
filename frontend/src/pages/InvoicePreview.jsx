@@ -4,7 +4,7 @@ import jsPDF from 'jspdf';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api';
 import Layout from '../layouts/Layout';
-import { Download, Printer, ArrowLeft, Mail, Share2, Loader2, Scissors } from 'lucide-react';
+import { Download, ArrowLeft, Loader2, Scissors } from 'lucide-react';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
 import { formatCurrency } from '../utils/utils';
@@ -19,9 +19,24 @@ const InvoicePreview = () => {
     const [invoice, setInvoice] = useState(null);
     const [loading, setLoading] = useState(true);
     const [downloading, setDownloading] = useState(false);
+    const [scale, setScale] = useState(1);
 
     useEffect(() => {
         fetchInvoice();
+
+        const handleResize = () => {
+            if (window.innerWidth < 896) {
+                // 32px is total horizontal padding (16px each side)
+                const newScale = (window.innerWidth - 32) / 896;
+                setScale(newScale);
+            } else {
+                setScale(1);
+            }
+        };
+
+        handleResize();
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
     }, [id]);
 
     const fetchInvoice = async () => {
@@ -46,7 +61,16 @@ const InvoicePreview = () => {
             scale: 2, // Higher scale for better quality
             useCORS: true, // Allow loading cross-origin images
             logging: false,
-            backgroundColor: '#ffffff'
+            backgroundColor: '#ffffff',
+            windowWidth: 896,
+            onclone: (clonedDoc) => {
+                const clonedContainer = clonedDoc.getElementById('scaling-container');
+                if (clonedContainer) {
+                    clonedContainer.style.transform = 'none';
+                    clonedContainer.style.marginBottom = '0';
+                    clonedContainer.style.width = '896px';
+                }
+            }
         });
 
         const imgData = canvas.toDataURL('image/png');
@@ -67,12 +91,15 @@ const InvoicePreview = () => {
         if (linkElement) {
             const linkRect = linkElement.getBoundingClientRect();
             const containerRect = element.getBoundingClientRect();
-            const scaleFactor = imgWidth / element.offsetWidth;
 
-            const linkX = (linkRect.left - containerRect.left) * scaleFactor;
-            const linkY = (linkRect.top - containerRect.top) * scaleFactor;
-            const linkW = linkRect.width * scaleFactor;
-            const linkH = linkRect.height * scaleFactor;
+            // Critical: Adjust coordinates back to 1:1 scale before applying mm scale
+            const invScale = scale || 1;
+            const scaleFactor = imgWidth / 896; // 896 is the base desktop width
+
+            const linkX = ((linkRect.left - containerRect.left) / invScale) * scaleFactor;
+            const linkY = ((linkRect.top - containerRect.top) / invScale) * scaleFactor;
+            const linkW = (linkRect.width / invScale) * scaleFactor;
+            const linkH = (linkRect.height / invScale) * scaleFactor;
 
             pdf.link(linkX, linkY, linkW, linkH, { url: linkElement.href });
         }
@@ -95,57 +122,10 @@ const InvoicePreview = () => {
         }
     };
 
-    const handlePrint = () => {
-        window.print();
-    };
-
     const handleSend = () => {
         const subject = encodeURIComponent(`Invoice ${invoice.invoiceNumber} from ${invoice.companyDetails?.name || 'iTEK Solutions'}`);
         const body = encodeURIComponent(`Hi ${invoice.customerDetails?.name},\n\nPlease find attached invoice ${invoice.invoiceNumber}.\n\nTotal Amount: ${formatCurrency(invoice.totalAmount)}\n\nThank you for your business!`);
         window.location.href = `mailto:${invoice.customerDetails?.email || ''}?subject=${subject}&body=${body}`;
-    };
-
-    const handleShare = async () => {
-        try {
-            // Priority 1: Try sharing the actual PDF file (Mobile/Modern Browsers)
-            if (navigator.share && navigator.canShare) {
-                setDownloading(true);
-                const pdf = await generateInvoicePdf();
-                if (pdf) {
-                    const blob = pdf.output('blob');
-                    const file = new File([blob], `Invoice-${invoice.invoiceNumber}.pdf`, { type: 'application/pdf' });
-
-                    if (navigator.canShare({ files: [file] })) {
-                        await navigator.share({
-                            files: [file],
-                            title: `Invoice ${invoice.invoiceNumber}`,
-                            text: `Invoice ${invoice.invoiceNumber} from ${invoice.companyDetails?.name}`,
-                        });
-                        setDownloading(false);
-                        return;
-                    }
-                }
-                setDownloading(false);
-            }
-
-            // Priority 2: Fallback to sharing URL
-            const shareData = {
-                title: `Invoice ${invoice.invoiceNumber}`,
-                text: `View invoice ${invoice.invoiceNumber} from ${invoice.companyDetails?.name}`,
-                url: window.location.href,
-            };
-
-            if (navigator.share) {
-                await navigator.share(shareData);
-            } else {
-                await navigator.clipboard.writeText(window.location.href);
-                alert('Invoice link copied to clipboard!');
-            }
-        } catch (err) {
-            console.error('Error sharing:', err);
-        } finally {
-            setDownloading(false);
-        }
     };
 
     if (loading) return <Layout><div className="flex justify-center p-20 text-slate-400 font-bold">Synchronizing Data...</div></Layout>;
@@ -159,37 +139,43 @@ const InvoicePreview = () => {
 
     return (
         <Layout>
-            <div className="space-y-8 pb-20 no-print-bg">
+            <div className="space-y-8 pb-32 no-print-bg">
                 {/* Sticky Header */}
-                <div className="sticky top-16 z-40 -mx-4 px-4 py-4 glass border-b border-white/20 dark:border-slate-800/50 mb-8 flex items-center justify-between no-print">
-                    <div className="flex items-center space-x-4">
-                        <button onClick={() => navigate('/')} className="p-2 glass hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
+                <div className="sticky top-16 z-40 -mx- px-4 py-4 bg-surface-100/80 backdrop-blur-xl border-b border-outline mb-8 flex items-center justify-between no-print overflow-hidden">
+                    <div className="flex items-center space-x-3 md:space-x-4 min-w-0">
+                        <button onClick={() => navigate('/')} className="p-2.5 md:p-3 bg-surface-200 border border-outline hover:bg-surface-300 rounded-2xl transition-all flex-shrink-0">
                             <ArrowLeft className="h-5 w-5" />
                         </button>
-                        <div>
-                            <h1 className="text-xl font-black text-slate-900 dark:text-white">Invoice Preview</h1>
-                            <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">{invoice.invoiceNumber}</p>
+                        <div className="min-w-0">
+                            <h1 className="text-lg md:text-2xl font-black text-white tracking-tight truncate">Preview</h1>
+                            <p className="text-[10px] md:text-xs text-slate-500 font-bold uppercase tracking-widest truncate">{invoice.invoiceNumber}</p>
                         </div>
                     </div>
-                    <div className="flex items-center space-x-3">
-                        <button onClick={handlePrint} className="px-4 py-2.5 glass active:scale-95 transition-all text-slate-700 dark:text-slate-200 font-bold rounded-xl flex items-center space-x-2">
-                            <Printer className="h-4 w-4" />
-                            <span className="hidden sm:inline">Print</span>
-                        </button>
-                        <button onClick={handleDownload} disabled={downloading} className="px-4 py-2.5 bg-primary/10 text-primary hover:bg-primary/20 font-bold rounded-xl transition-all flex items-center space-x-2 active:scale-95 disabled:opacity-50">
+                    <div className="flex items-center ml-2">
+                        <button
+                            onClick={handleDownload}
+                            disabled={downloading}
+                            className="px-4 md:px-8 py-2.5 md:py-3 bg-gradient-to-r from-primary to-red-700 hover:to-red-600 text-white font-black rounded-xl md:rounded-2xl shadow-xl shadow-primary/20 transition-all flex items-center space-x-2 active:scale-95 disabled:opacity-50 whitespace-nowrap"
+                        >
                             {downloading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-                            <span className="hidden sm:inline">{downloading ? 'Preparing...' : 'Download PDF'}</span>
-                        </button>
-                        <button onClick={handleShare} className="px-6 py-2.5 bg-primary hover:bg-red-700 text-white font-bold rounded-xl shadow-lg shadow-red-500/30 transition-all flex items-center space-x-2 active:scale-95">
-                            <Share2 className="h-4 w-4" />
-                            <span>Share</span>
+                            <span className="text-xs md:text-sm">{downloading ? 'PREPARING...' : 'DOWNLOAD PDF'}</span>
                         </button>
                     </div>
                 </div>
 
-                {/* Desktop-only layout wrapper - scrollable on mobile */}
-                <div className="overflow-x-auto no-print">
-                    <div className="min-w-[896px]">
+                {/* Desktop-only layout wrapper - now scaled for perfect mobile fit */}
+                <div className="overflow-x-hidden no-print flex justify-center">
+                    <div
+                        id="scaling-container"
+                        className="transition-transform duration-300"
+                        style={{
+                            width: '896px',
+                            minWidth: '896px',
+                            transform: `scale(${scale})`,
+                            transformOrigin: 'top center',
+                            marginBottom: scale < 1 ? `-${(1 - scale) * 1400}px` : '0px'
+                        }}
+                    >
                         <motion.div
                             ref={invoiceRef}
                             initial={{ opacity: 0, y: 20 }}
@@ -201,9 +187,12 @@ const InvoicePreview = () => {
                                 {/* Top Left */}
                                 <div className="space-y-12">
                                     <h1 className="text-5xl font-light tracking-tight text-black">INVOICE</h1>
-                                    <div className="pl-32 space-y-1">
+                                    <div className="pl-32 space-y-0.5">
                                         <p className="font-bold text-sm text-slate-700">{invoice.customerDetails?.name || 'Name Here'}</p>
-                                        <p className="text-xs text-slate-500 whitespace-pre-line leading-relaxed font-size: 12px; color: #4b5563; white-space: pre-line; max-width: 300px; line-height: 1.5; ">{invoice.customerDetails?.address || 'Company Address Here'}</p>
+                                        <p className="text-xs text-slate-500 whitespace-pre-line leading-relaxed max-w-[300px]">
+                                            {invoice.customerDetails?.address}
+                                        </p>
+
                                     </div>
                                 </div>
 
@@ -314,7 +303,7 @@ const InvoicePreview = () => {
                                             <div className="space-y-1.5 font-medium text-slate-600">
                                                 <p className="font-black text-slate-950 mb-1">{invoice.customerDetails?.name || 'Name Here'}</p>
                                                 <p className="whitespace-pre-line">{invoice.customerDetails?.address || 'Customer Address Here'}</p>
-                                                <p>{invoice.customerDetails?.phone || 'Phone Here'}</p>
+                                                <p>{invoice.customerDetails?.phone}</p>
                                                 <p>{invoice.customerDetails?.email}</p>
                                                 <p>{invoice.customerDetails?.website}</p>
                                             </div>
