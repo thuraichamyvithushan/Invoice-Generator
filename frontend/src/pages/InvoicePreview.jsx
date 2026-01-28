@@ -38,57 +38,55 @@ const InvoicePreview = () => {
 
     const invoiceRef = useRef(null);
 
-    const handleDownload = async () => {
-        if (!invoiceRef.current) return;
+    const generateInvoicePdf = async () => {
+        if (!invoiceRef.current) return null;
 
+        const element = invoiceRef.current;
+        const canvas = await html2canvas(element, {
+            scale: 2, // Higher scale for better quality
+            useCORS: true, // Allow loading cross-origin images
+            logging: false,
+            backgroundColor: '#ffffff'
+        });
+
+        const imgData = canvas.toDataURL('image/png');
+        const imgWidth = 210; // A4 width in mm
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        const pdfHeight = Math.max(imgHeight, 297);
+
+        const pdf = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: [imgWidth, pdfHeight]
+        });
+
+        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+
+        // Add clickable link over the "View and pay online now" text
+        const linkElement = document.getElementById('payment-link');
+        if (linkElement) {
+            const linkRect = linkElement.getBoundingClientRect();
+            const containerRect = element.getBoundingClientRect();
+            const scaleFactor = imgWidth / element.offsetWidth;
+
+            const linkX = (linkRect.left - containerRect.left) * scaleFactor;
+            const linkY = (linkRect.top - containerRect.top) * scaleFactor;
+            const linkW = linkRect.width * scaleFactor;
+            const linkH = linkRect.height * scaleFactor;
+
+            pdf.link(linkX, linkY, linkW, linkH, { url: linkElement.href });
+        }
+
+        return pdf;
+    };
+
+    const handleDownload = async () => {
         setDownloading(true);
         try {
-            const element = invoiceRef.current;
-            const canvas = await html2canvas(element, {
-                scale: 2, // Higher scale for better quality
-                useCORS: true, // Allow loading cross-origin images
-                logging: false,
-                backgroundColor: '#ffffff'
-            });
-
-            const imgData = canvas.toDataURL('image/png');
-            const imgWidth = 210; // A4 width in mm
-            // Calculate height maintaining aspect ratio
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-            // Create PDF with custom height if content is taller than A4 (297mm)
-            // ensuring it fits on one page without scaling or squishing
-            // Increased to 450mm to provide ample space for gaps
-            const pdfHeight = Math.max(imgHeight, 297);
-
-            const pdf = new jsPDF({
-                orientation: 'portrait',
-                unit: 'mm',
-                format: [imgWidth, pdfHeight]
-            });
-
-            pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-
-            // Add clickable link over the "View and pay online now" text
-            const linkElement = document.getElementById('payment-link');
-            if (linkElement) {
-                const linkRect = linkElement.getBoundingClientRect();
-                const containerRect = element.getBoundingClientRect();
-
-                // Calculate scale factor (mm per pixel)
-                const scaleFactor = imgWidth / element.offsetWidth;
-
-                // Calculate position and dimensions in mm
-                const linkX = (linkRect.left - containerRect.left) * scaleFactor;
-                const linkY = (linkRect.top - containerRect.top) * scaleFactor;
-                const linkW = linkRect.width * scaleFactor;
-                const linkH = linkRect.height * scaleFactor;
-
-                // Add link annotation
-                pdf.link(linkX, linkY, linkW, linkH, { url: linkElement.href });
+            const pdf = await generateInvoicePdf();
+            if (pdf) {
+                pdf.save(`Invoice-${invoice.invoiceNumber}.pdf`);
             }
-
-            pdf.save(`Invoice-${invoice.invoiceNumber}.pdf`);
         } catch (error) {
             console.error('PDF Generation Error:', error);
             alert('Failed to generate PDF');
@@ -108,13 +106,35 @@ const InvoicePreview = () => {
     };
 
     const handleShare = async () => {
-        const shareData = {
-            title: `Invoice ${invoice.invoiceNumber}`,
-            text: `View invoice ${invoice.invoiceNumber} from ${invoice.companyDetails?.name}`,
-            url: window.location.href,
-        };
-
         try {
+            // Priority 1: Try sharing the actual PDF file (Mobile/Modern Browsers)
+            if (navigator.share && navigator.canShare) {
+                setDownloading(true);
+                const pdf = await generateInvoicePdf();
+                if (pdf) {
+                    const blob = pdf.output('blob');
+                    const file = new File([blob], `Invoice-${invoice.invoiceNumber}.pdf`, { type: 'application/pdf' });
+
+                    if (navigator.canShare({ files: [file] })) {
+                        await navigator.share({
+                            files: [file],
+                            title: `Invoice ${invoice.invoiceNumber}`,
+                            text: `Invoice ${invoice.invoiceNumber} from ${invoice.companyDetails?.name}`,
+                        });
+                        setDownloading(false);
+                        return;
+                    }
+                }
+                setDownloading(false);
+            }
+
+            // Priority 2: Fallback to sharing URL
+            const shareData = {
+                title: `Invoice ${invoice.invoiceNumber}`,
+                text: `View invoice ${invoice.invoiceNumber} from ${invoice.companyDetails?.name}`,
+                url: window.location.href,
+            };
+
             if (navigator.share) {
                 await navigator.share(shareData);
             } else {
@@ -123,6 +143,8 @@ const InvoicePreview = () => {
             }
         } catch (err) {
             console.error('Error sharing:', err);
+        } finally {
+            setDownloading(false);
         }
     };
 
