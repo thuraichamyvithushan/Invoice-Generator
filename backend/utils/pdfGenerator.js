@@ -53,11 +53,11 @@ export const getInvoiceHtml = (invoice) => {
     const cEmail = companyDetails?.email || 'e-mail here';
     const cWebsite = companyDetails?.website || 'web site here';
 
-    // Paths to assets
-    const logoPath = path.resolve(__dirname, '../../frontend/src/assets/logo/iteks.png');
-    const visaPath = path.resolve(__dirname, '../../frontend/src/assets/icons/visa.svg');
-    const mcPath = path.resolve(__dirname, '../../frontend/src/assets/icons/mastercard.svg');
-    const amexPath = path.resolve(__dirname, '../../frontend/src/assets/icons/american-express.svg');
+    // Paths to assets - now using backend local assets for Vercel compatibility
+    const logoPath = path.resolve(__dirname, '../assets/logo/iteks.png');
+    const visaPath = path.resolve(__dirname, '../assets/icons/visa.svg');
+    const mcPath = path.resolve(__dirname, '../assets/icons/mastercard.svg');
+    const amexPath = path.resolve(__dirname, '../assets/icons/american-express.svg');
 
     const logoBase64 = base64Encode(logoPath);
     const visaBase64 = base64Encode(visaPath);

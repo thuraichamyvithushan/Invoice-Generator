@@ -319,7 +319,7 @@ const InvoicePreview = () => {
                                             <div className="pt-6 border-t border-slate-900 mt-6">
                                                 <div className="flex justify-between items-end mb-1 px-1">
                                                     <span className="font-black text-slate-900 uppercase text-[10px]">Amount Enclosed</span>
-                                                    <div className="border-b-2 border-slate-900 w-48 h-6">{formatCurrency(invoice.AmountEnclosed)}</div>
+                                                    <div className="border-b-2 border-slate-900 w-48 h-6">{formatCurrency(invoice.companyDetails?.AmountEnclosed)}</div>
                                                 </div>
                                                 <p className="text-[10px] text-right text-slate-400 font-medium italic mt-2">Enter the amount your are paying above</p>
                                             </div>
