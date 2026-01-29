@@ -49,9 +49,11 @@ app.use(async (req, res, next) => {
 
 import authRoutes from '../routes/authRoutes.js';
 import invoiceRoutes from '../routes/invoiceRoutes.js';
+import clientRoutes from '../routes/clientRoutes.js';
 
 app.use('/api/auth', authRoutes);
 app.use('/api/invoices', invoiceRoutes);
+app.use('/api/clients', clientRoutes);
 
 app.get('/', (req, res) => {
   res.send('Invoice Management System API');

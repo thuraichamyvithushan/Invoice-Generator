@@ -13,12 +13,12 @@ const InvoiceForm = () => {
     const { user } = useAuth();
     const [loading, setLoading] = useState(false);
     const [fetching, setFetching] = useState(false);
+    const [clients, setClients] = useState([]);
 
     const [formData, setFormData] = useState({
         invoiceNumber: '',
         invoiceDate: new Date().toISOString().split('T')[0],
-        dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        reference: '',
+        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         customerDetails: { name: '', address: '', email: '', website: '' },
         items: [{ description: '', quantity: 1, unitPrice: 0, total: 0 }],
         companyDetails: { name: '', address: '', phone: '', email: '', website: '', abn: '', AmountEnclosed: '' },
@@ -27,6 +27,7 @@ const InvoiceForm = () => {
     });
 
     useEffect(() => {
+        fetchClients();
         if (user && !id) {
             setFormData(prev => ({
                 ...prev,
@@ -42,6 +43,7 @@ const InvoiceForm = () => {
                 },
                 paymentInstructions: {
                     bankName: user.companyProfile?.bankName || '',
+                    accountName: user.companyProfile?.accountName || '',
                     accountNumber: user.companyProfile?.accountNumber || '',
                     bsb: user.companyProfile?.bsb || ''
                 }
@@ -52,6 +54,15 @@ const InvoiceForm = () => {
             fetchInvoice();
         }
     }, [id, user]);
+
+    const fetchClients = async () => {
+        try {
+            const res = await api.get('/clients');
+            setClients(res.data);
+        } catch (error) {
+            console.error('Failed to fetch clients');
+        }
+    };
 
     const fetchInvoice = async () => {
         setFetching(true);
@@ -77,8 +88,34 @@ const InvoiceForm = () => {
                 ...prev,
                 [section]: { ...prev[section], [field]: value }
             }));
+
+            // Auto-fill Client Details if name matches
+            if (field === 'name' && section === 'customerDetails') {
+                const existingClient = clients.find(c => c.name.toLowerCase() === value.toLowerCase());
+                if (existingClient) {
+                    setFormData(prev => ({
+                        ...prev,
+                        customerDetails: {
+                            name: existingClient.name,
+                            address: existingClient.address || '',
+                            email: existingClient.email || '',
+                            phone: existingClient.phone || '',
+                            website: existingClient.website || ''
+                        }
+                    }));
+                }
+            }
         } else {
-            setFormData(prev => ({ ...prev, [field]: value }));
+            const updates = { [field]: value };
+
+            // Auto-update Due Date when Invoice Date changes
+            if (field === 'invoiceDate') {
+                const date = new Date(value);
+                date.setDate(date.getDate() + 7);
+                updates.dueDate = date.toISOString().split('T')[0];
+            }
+
+            setFormData(prev => ({ ...prev, ...updates }));
         }
     };
 
@@ -190,10 +227,9 @@ const InvoiceForm = () => {
                                     <label className="text-[10px] font-black text-slate-500 uppercase flex items-center gap-1.5"><Clock className="h-3 w-3" /> Due Date</label>
                                     <input
                                         type="date"
-                                        required
-                                        className="w-full px-4 py-3 bg-surface-100 border border-outline rounded-xl text-white font-bold outline-none focus:ring-2 focus:ring-primary/40"
+                                        readOnly
+                                        className="w-full px-4 py-3 bg-surface-200 border border-outline rounded-xl text-slate-400 font-bold outline-none cursor-not-allowed"
                                         value={formData.dueDate}
-                                        onChange={(e) => handleInputChange('dueDate', e.target.value)}
                                     />
                                 </div>
                                 <div className="space-y-2">
@@ -206,28 +242,18 @@ const InvoiceForm = () => {
                                         onChange={(e) => handleInputChange('abn', e.target.value, 'companyDetails')}
                                     />
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-slate-500 uppercase flex items-center gap-1.5"><Hash className="h-3 w-3" /> Amount Enclosed</label>
-                                    <input
-                                        type="text"
-                                        placeholder="Enter amount"
-                                        className="w-full px-4 py-3 bg-surface-100 border border-outline rounded-xl text-white font-bold outline-none focus:ring-2 focus:ring-primary/40"
-                                        value={formData.companyDetails.AmountEnclosed}
-                                        onChange={(e) => handleInputChange('AmountEnclosed', e.target.value, 'companyDetails')}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-slate-500 uppercase flex items-center gap-1.5"><Tag className="h-3 w-3" /> Status</label>
-                                    <select
-                                        className="w-full px-4 py-3 bg-surface-100 border border-outline rounded-xl text-white font-bold outline-none focus:ring-2 focus:ring-primary/40 appearance-none cursor-pointer"
-                                        value={formData.status}
-                                        onChange={(e) => handleInputChange('status', e.target.value)}
-                                    >
-                                        <option value="Draft">Draft</option>
-                                        <option value="Sent">Sent</option>
-                                        <option value="Paid">Paid</option>
-                                    </select>
-                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black text-slate-500 uppercase flex items-center gap-1.5"><Tag className="h-3 w-3" /> Status</label>
+                                <select
+                                    className="w-full px-4 py-3 bg-surface-100 border border-outline rounded-xl text-white font-bold outline-none focus:ring-2 focus:ring-primary/40 appearance-none cursor-pointer"
+                                    value={formData.status}
+                                    onChange={(e) => handleInputChange('status', e.target.value)}
+                                >
+                                    <option value="Draft">Draft</option>
+                                    <option value="Sent">Sent</option>
+                                    <option value="Paid">Paid</option>
+                                </select>
                             </div>
                         </motion.div>
 
@@ -311,7 +337,7 @@ const InvoiceForm = () => {
                                         <span className="text-xs font-bold uppercase tracking-widest">Total Calculation</span>
                                     </div>
                                     <div className="text-right">
-                                        <p className="text-sm text-slate-500 font-medium">Grand Total (USD)</p>
+                                        <p className="text-sm text-slate-500 font-medium">Grand Total (AUD)</p>
                                         <p className="text-4xl font-black text-primary">{formatCurrency(calculateSubtotal())}</p>
                                     </div>
                                 </div>
@@ -332,11 +358,17 @@ const InvoiceForm = () => {
                                     <input
                                         type="text"
                                         required
+                                        list="client-list"
                                         className="w-full px-4 py-3 bg-surface-100 border border-outline rounded-xl text-white font-bold outline-none focus:ring-2 focus:ring-primary/40"
                                         placeholder="Enter customer name"
                                         value={formData.customerDetails.name}
                                         onChange={(e) => handleInputChange('name', e.target.value, 'customerDetails')}
                                     />
+                                    <datalist id="client-list">
+                                        {clients.map(client => (
+                                            <option key={client._id} value={client.name} />
+                                        ))}
+                                    </datalist>
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Client Address</label>
@@ -397,6 +429,15 @@ const InvoiceForm = () => {
                                         onChange={(e) => handleInputChange('bankName', e.target.value, 'paymentInstructions')}
                                     />
                                 </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Account Name</label>
+                                    <input
+                                        type="text"
+                                        className="w-full px-4 py-3 bg-surface-100 border border-outline rounded-xl text-white font-bold outline-none focus:ring-2 focus:ring-primary/40"
+                                        value={formData.paymentInstructions.accountName}
+                                        onChange={(e) => handleInputChange('accountName', e.target.value, 'paymentInstructions')}
+                                    />
+                                </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">BSB</label>
@@ -421,8 +462,8 @@ const InvoiceForm = () => {
                         </motion.div>
                     </div>
                 </div>
-            </div>
-        </Layout>
+            </div >
+        </Layout >
     );
 };
 

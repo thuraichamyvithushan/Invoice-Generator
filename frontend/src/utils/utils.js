@@ -6,8 +6,8 @@ export function cn(...inputs) {
 }
 
 export function formatCurrency(amount) {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-AU', {
         style: 'currency',
-        currency: 'USD',
+        currency: 'AUD',
     }).format(amount);
 }

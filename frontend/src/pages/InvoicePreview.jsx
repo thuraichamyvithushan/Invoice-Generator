@@ -188,9 +188,9 @@ const InvoicePreview = () => {
                                 <div className="space-y-12">
                                     <h1 className="text-5xl font-light tracking-tight text-black">INVOICE</h1>
                                     <div className="pl-32 space-y-0.5">
-                                        <p className="font-bold text-sm text-slate-700">{invoice.customerDetails?.name || 'Name Here'}</p>
+                                        <p className="font-bold text-sm text-slate-700">{(invoice.clientId?.name || invoice.customerDetails?.name) || 'Name Here'}</p>
                                         <p className="text-xs text-slate-500 whitespace-pre-line leading-relaxed max-w-[300px]">
-                                            {invoice.customerDetails?.address}
+                                            {(invoice.clientId?.address || invoice.customerDetails?.address)}
                                         </p>
 
                                     </div>
@@ -213,10 +213,7 @@ const InvoicePreview = () => {
                                                 <p className="font-bold text-slate-800">Invoice Number</p>
                                                 <p className="text-slate-500">{invoice.invoiceNumber || 'INV-00001'}</p>
                                             </div>
-                                            <div>
-                                                <p className="font-bold text-slate-800">Reference</p>
-                                                <p className="text-slate-500">{invoice.reference || 'PT'}</p>
-                                            </div>
+
                                             <div>
                                                 <p className="font-bold text-slate-800">ABN</p>
                                                 <p className="text-slate-500">{invoice.companyDetails?.abn || '96 678 973 085'}</p>
@@ -241,7 +238,7 @@ const InvoicePreview = () => {
                                         <th className="text-left py-2 font-bold uppercase tracking-wider">Description</th>
                                         <th className="text-center py-2 font-bold uppercase tracking-wider">Quantity</th>
                                         <th className="text-right py-2 font-bold uppercase tracking-wider">Unit Price</th>
-                                        <th className="text-right py-2 font-bold uppercase tracking-wider">Amount USD</th>
+                                        <th className="text-right py-2 font-bold uppercase tracking-wider">Amount AUD</th>
                                     </tr>
                                 </thead>
                                 <tbody className="text-[11px] text-slate-700">
@@ -259,7 +256,7 @@ const InvoicePreview = () => {
                             {/* Totals Section */}
                             <div className="flex justify-end p-2 border-t border-slate-700 mb-20">
                                 <div className="w-64 flex justify-between items-center text-xs font-bold">
-                                    <span className="uppercase tracking-widest text-slate-900">TOTAL USD</span>
+                                    <span className="uppercase tracking-widest text-slate-900">TOTAL AUD</span>
                                     <span className="text-sm font-black text-slate-950">{formatCurrency(invoice.totalAmount)}</span>
                                 </div>
                             </div>
@@ -270,14 +267,14 @@ const InvoicePreview = () => {
                                 <div className="space-y-6">
                                     <div className="space-y-2">
                                         <p className="font-bold text-slate-900">Due Date: {invoice.dueDate ? format(new Date(invoice.dueDate), 'dd MMM yyyy') : 'DD Feb 2026'}</p>
-                                        <p>We accept payment by bank transfer or card.</p>
+                                        <p>We accept payment by Bank transfer or Card.</p>
                                         <div className="pt-2">
                                             <p className="font-bold text-slate-900">Bank Details:</p>
-                                            <p>Account name: {invoice.companyDetails?.name || 'Name Here'}</p>
+                                            <p>Bank: {invoice.paymentInstructions?.bankName || 'Here'}</p>
+                                            <p>Account name: {invoice.paymentInstructions?.accountName || invoice.companyDetails?.name || 'Name Here'}</p>
                                             <p>Account Number: {invoice.paymentInstructions?.accountNumber || 'Here'}</p>
                                             <p>BSB: {invoice.paymentInstructions?.bsb || 'Here'}</p>
                                         </div>
-                                        <p className="italic text-slate-500 pt-4">Please quote your invoice number as reference.</p>
                                     </div>
 
                                     <div className="flex items-center space-x-4 pt-4">
@@ -285,7 +282,16 @@ const InvoicePreview = () => {
                                         <img src={mastercard} alt="Mastercard" className="h-6 w-auto" />
                                         <img src={amex} alt="Amex" className="h-6 w-auto" />
                                     </div>
-                                    <p className="text-primary font-bold underline cursor-pointer"><a id="payment-link" href='https://iteksolutions.com.au/' target="_blank" rel="noopener noreferrer">View and pay online now</a></p>
+                                    <p className="text-primary font-bold underline cursor-pointer">
+                                        <a
+                                            id="payment-link"
+                                            href={`https://buy.stripe.com/9B6eVdgwWglY6fv9k94ow02?__prefilled_amount=${Math.round(invoice.totalAmount * 100)}&client_reference_id=${invoice.invoiceNumber}&prefilled_email=${encodeURIComponent(invoice.clientId?.email || invoice.customerDetails?.email || '')}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
+                                            View and pay online now
+                                        </a>
+                                    </p>
                                 </div>
                             </div>
 
@@ -301,18 +307,18 @@ const InvoicePreview = () => {
                                         <div className="flex space-x-12 text-[11px]">
                                             <span className="font-bold mt-1 text-slate-900">To:</span>
                                             <div className="space-y-1.5 font-medium text-slate-600">
-                                                <p className="font-black text-slate-950 mb-1">{invoice.customerDetails?.name || 'Name Here'}</p>
-                                                <p className="whitespace-pre-line">{invoice.customerDetails?.address || 'Customer Address Here'}</p>
-                                                <p>{invoice.customerDetails?.phone}</p>
-                                                <p>{invoice.customerDetails?.email}</p>
-                                                <p>{invoice.customerDetails?.website}</p>
+                                                <p className="font-black text-slate-950 mb-1">{(invoice.clientId?.name || invoice.customerDetails?.name) || 'Name Here'}</p>
+                                                <p className="whitespace-pre-line">{(invoice.clientId?.address || invoice.customerDetails?.address) || 'Customer Address Here'}</p>
+                                                <p>{(invoice.clientId?.phone || invoice.customerDetails?.phone)}</p>
+                                                <p>{(invoice.clientId?.email || invoice.customerDetails?.email)}</p>
+                                                <p>{(invoice.clientId?.website || invoice.customerDetails?.website)}</p>
                                             </div>
                                         </div>
 
                                         <div className="space-y-1 text-xs">
                                             <div className="flex justify-between border-b border-slate-200 py-1.5">
                                                 <span className="font-bold text-slate-500 uppercase text-[9px]">Customer</span>
-                                                <span className="font-black text-slate-900 tracking-tight">{invoice.customerDetails?.name || 'Name here'}</span>
+                                                <span className="font-black text-slate-900 tracking-tight">{(invoice.clientId?.name || invoice.customerDetails?.name) || 'Name here'}</span>
                                             </div>
                                             <div className="flex justify-between border-b border-slate-200 py-1.5">
                                                 <span className="font-bold text-slate-500 uppercase text-[9px]">Invoice Number</span>
@@ -330,7 +336,7 @@ const InvoicePreview = () => {
                                             <div className="pt-6 border-t border-slate-900 mt-6">
                                                 <div className="flex justify-between items-end mb-1 px-1">
                                                     <span className="font-black text-slate-900 uppercase text-[10px]">Amount Enclosed</span>
-                                                    <div className="border-b-2 border-slate-900 w-48 h-6">{formatCurrency(invoice.companyDetails?.AmountEnclosed)}</div>
+                                                    <div className="border-b-2 border-slate-900 w-48 h-6 flex justify-end font-black text-sm">{formatCurrency(invoice.totalAmount)}</div>
                                                 </div>
                                                 <p className="text-[10px] text-right text-slate-400 font-medium italic mt-2">Enter the amount your are paying above</p>
                                             </div>

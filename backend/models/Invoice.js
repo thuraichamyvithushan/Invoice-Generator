@@ -35,8 +35,13 @@ const invoiceSchema = new mongoose.Schema({
         website: String,
         abn: String
     },
+    clientId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Client',
+        required: true
+    },
     customerDetails: {
-        name: { type: String, required: true },
+        name: String,
         address: String,
         email: String,
         phone: String,
@@ -55,7 +60,7 @@ const invoiceSchema = new mongoose.Schema({
     },
     currency: {
         type: String,
-        default: 'USD'
+        default: 'AUD'
     },
     paymentInstructions: {
         bankName: String,

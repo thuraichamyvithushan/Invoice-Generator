@@ -11,9 +11,11 @@ const Register = () => {
         password: '',
         companyName: '',
         address: '',
-        phone: '',
-        website: '',
-        abn: ''
+        abn: '',
+        bankName: '',
+        accountName: '',
+        accountNumber: '',
+        bsb: ''
     });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
@@ -37,7 +39,11 @@ const Register = () => {
                     address: formData.address,
                     phone: formData.phone,
                     website: formData.website,
-                    abn: formData.abn
+                    abn: formData.abn,
+                    bankName: formData.bankName,
+                    accountName: formData.accountName,
+                    accountNumber: formData.accountNumber,
+                    bsb: formData.bsb
                 }
             });
             navigate('/');
@@ -55,6 +61,10 @@ const Register = () => {
         { name: 'phone', type: 'text', placeholder: 'Phone Number', icon: Phone, section: 'profile' },
         { name: 'website', type: 'text', placeholder: 'Website (Optional)', icon: Globe, section: 'profile' },
         { name: 'abn', type: 'text', placeholder: 'ABN (e.g. 96 678 973 085)', icon: Hash, section: 'profile' },
+        { name: 'bankName', type: 'text', placeholder: 'Bank Name', icon: Building, section: 'bank' },
+        { name: 'accountName', type: 'text', placeholder: 'Account Name', icon: User, section: 'bank' },
+        { name: 'accountNumber', type: 'text', placeholder: 'Account Number', icon: Hash, section: 'bank' },
+        { name: 'bsb', type: 'text', placeholder: 'BSB', icon: Hash, section: 'bank' },
         { name: 'address', type: 'textarea', placeholder: 'Company Address', icon: MapPin, section: 'profile' },
     ];
 

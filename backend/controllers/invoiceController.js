@@ -1,9 +1,10 @@
 import Invoice from '../models/Invoice.js';
+import Client from '../models/Client.js';
 import { generatePdf, getInvoiceHtml } from '../utils/pdfGenerator.js';
 
 export const downloadInvoicePdf = async (req, res) => {
     try {
-        const invoice = await Invoice.findOne({ _id: req.params.id, userId: req.user._id });
+        const invoice = await Invoice.findOne({ _id: req.params.id, userId: req.user._id }).populate('clientId');
         if (!invoice) {
             return res.status(404).json({ message: 'Invoice not found' });
         }
@@ -26,10 +27,28 @@ export const createInvoice = async (req, res) => {
         } = req.body;
 
         const subtotal = items.reduce((acc, item) => acc + item.total, 0);
-        const totalAmount = subtotal; // For now, keep it simple. Could add tax later.
+        const totalAmount = subtotal;
+
+        // Smart Client Handling: Find or Create
+        let client = await Client.findOne({ userId: req.user._id, name: customerDetails.name });
+
+        if (!client) {
+            client = new Client({
+                ...customerDetails,
+                userId: req.user._id
+            });
+            await client.save();
+        } else {
+            // Update existing client details if they have changed (minimal support for "must remain editable")
+            // Actually, requirements say "Auto-filled fields must remain editable", 
+            // and saving should update the client.
+            Object.assign(client, customerDetails);
+            await client.save();
+        }
 
         const invoice = new Invoice({
             userId: req.user._id,
+            clientId: client._id,
             invoiceNumber,
             invoiceDate,
             dueDate,
@@ -61,7 +80,7 @@ export const getInvoices = async (req, res) => {
             ];
         }
 
-        const invoices = await Invoice.find(query).sort({ createdAt: -1 });
+        const invoices = await Invoice.find(query).sort({ createdAt: -1 }).populate('clientId');
         res.json(invoices);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -70,7 +89,7 @@ export const getInvoices = async (req, res) => {
 
 export const getInvoiceById = async (req, res) => {
     try {
-        const invoice = await Invoice.findOne({ _id: req.params.id, userId: req.user._id });
+        const invoice = await Invoice.findOne({ _id: req.params.id, userId: req.user._id }).populate('clientId');
         if (!invoice) {
             return res.status(404).json({ message: 'Invoice not found' });
         }
@@ -90,15 +109,26 @@ export const updateInvoice = async (req, res) => {
         const subtotal = items.reduce((acc, item) => acc + item.total, 0);
         const totalAmount = subtotal;
 
+        // Smart Client Handling
+        let client = await Client.findOne({ userId: req.user._id, name: customerDetails.name });
+        if (!client) {
+            client = new Client({ ...customerDetails, userId: req.user._id });
+            await client.save();
+        } else {
+            Object.assign(client, customerDetails);
+            await client.save();
+        }
+
         const invoice = await Invoice.findOneAndUpdate(
             { _id: req.params.id, userId: req.user._id },
             {
+                clientId: client._id,
                 invoiceNumber, invoiceDate, dueDate, reference,
                 customerDetails, items, companyDetails, paymentInstructions,
                 subtotal, totalAmount, status
             },
             { new: true }
-        );
+        ).populate('clientId');
 
         if (!invoice) {
             return res.status(404).json({ message: 'Invoice not found' });
