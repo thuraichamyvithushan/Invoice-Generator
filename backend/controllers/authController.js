@@ -72,7 +72,7 @@ export const forgotPassword = async (req, res) => {
         user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
         await user.save();
 
-        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+        const frontendUrl = process.env.FRONTEND_URL || req.get('origin') || 'http://localhost:5173';
         const resetUrl = `${frontendUrl}/reset-password?token=${token}`;
         // Send real email
         await sendResetEmail(email, resetUrl);
