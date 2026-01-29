@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LogOut, FileText, PlusCircle, LayoutDashboard, Menu, X } from 'lucide-react';
+import { LogOut, FileText, PlusCircle, LayoutDashboard, Menu, X, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../utils/utils';
 import logo from "../assets/logo/iTek_logo.png";
@@ -22,6 +22,7 @@ const Navbar = () => {
     const navItems = [
         { label: 'Dashboard', path: '/', icon: LayoutDashboard },
         { label: 'New Invoice', path: '/invoices/new', icon: PlusCircle },
+        { label: 'Profile', path: '/profile', icon: User },
     ];
 
     return (
@@ -66,10 +67,10 @@ const Navbar = () => {
 
                     <div className="flex items-center space-x-4">
                         <div className="hidden md:flex items-center space-x-4 border-l border-outline ml-4 pl-4">
-                            <div className="flex flex-col items-end">
-                                <span className="text-sm font-bold text-white leading-none mb-1">{user.companyProfile?.name || 'User'}</span>
-                                <span className="text-[11px] text-slate-500 font-medium">{user.email}</span>
-                            </div>
+                            <Link to="/profile" className="flex flex-col items-end hover:text-primary transition-colors">
+                                <span className="text-sm font-bold text-white leading-none mb-1 group-hover:text-primary">{user.companyProfile?.name || 'User'}</span>
+                                <span className="text-[11px] text-slate-500 font-medium">Edit Profile</span>
+                            </Link>
                             <button
                                 onClick={handleLogout}
                                 className="p-2 text-slate-500 hover:text-red-500 transition-colors"

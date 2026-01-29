@@ -6,6 +6,9 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import InvoiceForm from './pages/InvoiceForm';
 import InvoicePreview from './pages/InvoicePreview';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
+import Profile from './pages/Profile';
 
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -24,6 +27,9 @@ function App() {
           <Route path="/invoices/new" element={<PrivateRoute><InvoiceForm /></PrivateRoute>} />
           <Route path="/invoices/edit/:id" element={<PrivateRoute><InvoiceForm /></PrivateRoute>} />
           <Route path="/invoices/view/:id" element={<PrivateRoute><InvoicePreview /></PrivateRoute>} />
+          <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
         </Routes>
       </Router>
     </AuthProvider>

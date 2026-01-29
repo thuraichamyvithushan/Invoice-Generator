@@ -22,33 +22,45 @@ const InvoiceForm = () => {
         customerDetails: { name: '', address: '', email: '', website: '' },
         items: [{ description: '', quantity: 1, unitPrice: 0, total: 0 }],
         companyDetails: { name: '', address: '', phone: '', email: '', website: '', abn: '', AmountEnclosed: '' },
-        paymentInstructions: { bankName: '', accountNumber: '', bsb: '' },
+        paymentInstructions: { bankName: '', accountName: '', accountNumber: '', bsb: '' },
         status: 'Draft'
     });
 
     useEffect(() => {
         fetchClients();
-        if (user && !id) {
-            setFormData(prev => ({
-                ...prev,
-                invoiceNumber: `INV-${Date.now().toString().slice(-6)}`,
-                companyDetails: {
-                    name: user.companyProfile?.name || '',
-                    address: user.companyProfile?.address || '',
-                    phone: user.companyProfile?.phone || '',
-                    email: user.companyProfile?.email || user.email,
-                    website: user.companyProfile?.website || '',
-                    abn: user.companyProfile?.abn || '',
-                    AmountEnclosed: user.companyDetails?.AmountEnclosed || ''
-                },
-                paymentInstructions: {
-                    bankName: user.companyProfile?.bankName || '',
-                    accountName: user.companyProfile?.accountName || '',
-                    accountNumber: user.companyProfile?.accountNumber || '',
-                    bsb: user.companyProfile?.bsb || ''
+        const initForm = async () => {
+            if (user && !id) {
+                let nextNum = '001';
+                try {
+                    const res = await api.get('/invoices');
+                    const count = res.data.length;
+                    nextNum = String(count + 1).padStart(3, '0');
+                } catch (e) {
+                    console.error('Failed to fetch invoice count');
                 }
-            }));
-        }
+
+                setFormData(prev => ({
+                    ...prev,
+                    invoiceNumber: `INV-${nextNum}`,
+                    companyDetails: {
+                        name: user.companyProfile?.name || '',
+                        address: user.companyProfile?.address || '',
+                        phone: user.companyProfile?.phone || '',
+                        email: user.companyProfile?.email || user.email,
+                        website: user.companyProfile?.website || '',
+                        abn: user.companyProfile?.abn || '',
+                        AmountEnclosed: user.companyDetails?.AmountEnclosed || ''
+                    },
+                    paymentInstructions: {
+                        bankName: user.companyProfile?.bankName || '',
+                        accountName: user.companyProfile?.accountName || '',
+                        accountNumber: user.companyProfile?.accountNumber || '',
+                        bsb: user.companyProfile?.bsb || ''
+                    }
+                }));
+            }
+        };
+        initForm();
 
         if (id) {
             fetchInvoice();
@@ -170,7 +182,7 @@ const InvoiceForm = () => {
         <Layout>
             <div className="space-y-6 pb-32">
                 {/* Sticky Header */}
-                <div className="sticky top-16 z-40 -mx-4 px-4 py-4 bg-surface-100/80 backdrop-blur-xl border-b border-outline mb-8 flex items-center justify-between">
+                <div className="sticky top-16 z-40 -mx- px-4 py-4 bg-surface-100/80 backdrop-blur-xl border-b border-outline mb-8 flex items-center justify-between">
                     <div className="flex items-center space-x-4">
                         <button onClick={() => navigate('/')} className="p-3 bg-surface-200 border border-outline hover:bg-surface-300 rounded-2xl transition-all">
                             <ArrowLeft className="h-5 w-5" />

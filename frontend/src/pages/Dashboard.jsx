@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api';
 import Layout from '../layouts/Layout';
-import { Search, Plus, FileText, Download, Edit, Eye, TrendingUp, Clock, AlertCircle } from 'lucide-react';
+import { Search, Plus, FileText, Download, Edit, Eye, TrendingUp, Clock, AlertCircle, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn, formatCurrency } from '../utils/utils';
@@ -32,6 +32,17 @@ const Dashboard = () => {
     const handleSearch = (e) => {
         e.preventDefault();
         fetchInvoices(searchTerm);
+    };
+
+    const handleDeleteAll = async () => {
+        if (window.confirm('CRITICAL: This will permanently delete ALL invoices. Are you sure?')) {
+            try {
+                await api.delete('/invoices/delete/all');
+                setInvoices([]);
+            } catch (error) {
+                alert('Failed to delete all invoices');
+            }
+        }
     };
 
     const handleDelete = async (id) => {
@@ -110,13 +121,22 @@ const Dashboard = () => {
                         <h1 className="text-5xl font-black text-white tracking-tighter">Dashboard</h1>
                         <p className="text-slate-500 font-medium">Manage your business finances with ease.</p>
                     </div>
-                    <Link
-                        to="/invoices/new"
-                        className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-primary to-red-700 text-white font-black rounded-2xl shadow-[0_8px_30px_rgb(242,0,0,0.3)] transition-all hover:scale-105 active:scale-95 group"
-                    >
-                        <Plus className="h-5 w-5 mr-2 group-hover:rotate-90 transition-transform" />
-                        Create Invoice
-                    </Link>
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <button
+                            onClick={handleDeleteAll}
+                            className="inline-flex items-center px-8 py-4 bg-surface-300 border border-outline text-slate-400 font-black rounded-2xl transition-all hover:bg-rose-500/10 hover:text-rose-500 hover:border-rose-500/20 active:scale-95 group"
+                        >
+                            <Trash2 className="h-5 w-5 mr-2" />
+                            Delete All
+                        </button>
+                        <Link
+                            to="/invoices/new"
+                            className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-primary to-red-700 text-white font-black rounded-2xl shadow-[0_8px_30px_rgb(242,0,0,0.3)] transition-all hover:scale-105 active:scale-95 group"
+                        >
+                            <Plus className="h-5 w-5 mr-2 group-hover:rotate-90 transition-transform" />
+                            Create Invoice
+                        </Link>
+                    </div>
                 </div>
 
                 {/* Stats Row */}
@@ -237,6 +257,13 @@ const Dashboard = () => {
                                                     <Link to={`/invoices/edit/${invoice._id}`} className="p-3 bg-surface-300 rounded-xl text-slate-400 hover:text-white transition-colors" title="Edit">
                                                         <Edit className="h-4 w-4" />
                                                     </Link>
+                                                    <button
+                                                        onClick={() => handleDelete(invoice._id)}
+                                                        className="p-3 bg-surface-300 rounded-xl text-slate-400 hover:text-rose-500 transition-colors"
+                                                        title="Delete"
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </button>
                                                 </div>
                                                 <div className="flex gap-3">
                                                     <button onClick={() => handleDownload(invoice._id, invoice.invoiceNumber)} className="p-3 bg-surface-300 rounded-xl text-slate-400 hover:text-white transition-colors" title="Download">

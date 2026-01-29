@@ -30,7 +30,6 @@ const clientSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
-// Ensure a user doesn't have duplicate client names
 clientSchema.index({ userId: 1, name: 1 }, { unique: true });
 
 const Client = mongoose.model('Client', clientSchema);

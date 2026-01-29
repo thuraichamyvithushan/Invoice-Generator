@@ -29,7 +29,6 @@ export const createInvoice = async (req, res) => {
         const subtotal = items.reduce((acc, item) => acc + item.total, 0);
         const totalAmount = subtotal;
 
-        // Smart Client Handling: Find or Create
         let client = await Client.findOne({ userId: req.user._id, name: customerDetails.name });
 
         if (!client) {
@@ -39,9 +38,6 @@ export const createInvoice = async (req, res) => {
             });
             await client.save();
         } else {
-            // Update existing client details if they have changed (minimal support for "must remain editable")
-            // Actually, requirements say "Auto-filled fields must remain editable", 
-            // and saving should update the client.
             Object.assign(client, customerDetails);
             await client.save();
         }
@@ -109,7 +105,6 @@ export const updateInvoice = async (req, res) => {
         const subtotal = items.reduce((acc, item) => acc + item.total, 0);
         const totalAmount = subtotal;
 
-        // Smart Client Handling
         let client = await Client.findOne({ userId: req.user._id, name: customerDetails.name });
         if (!client) {
             client = new Client({ ...customerDetails, userId: req.user._id });
@@ -147,6 +142,15 @@ export const deleteInvoice = async (req, res) => {
             return res.status(404).json({ message: 'Invoice not found' });
         }
         res.json({ message: 'Invoice deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const deleteAllInvoices = async (req, res) => {
+    try {
+        await Invoice.deleteMany({ userId: req.user._id });
+        res.json({ message: 'All invoices deleted successfully' });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
