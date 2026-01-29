@@ -26,7 +26,6 @@ const InvoicePreview = () => {
 
         const handleResize = () => {
             if (window.innerWidth < 896) {
-                // 32px is total horizontal padding (16px each side)
                 const newScale = (window.innerWidth - 32) / 896;
                 setScale(newScale);
             } else {
@@ -58,8 +57,8 @@ const InvoicePreview = () => {
 
         const element = invoiceRef.current;
         const canvas = await html2canvas(element, {
-            scale: 2, // Higher scale for better quality
-            useCORS: true, // Allow loading cross-origin images
+            scale: 2,
+            useCORS: true, 
             logging: false,
             backgroundColor: '#ffffff',
             windowWidth: 896,
@@ -74,7 +73,7 @@ const InvoicePreview = () => {
         });
 
         const imgData = canvas.toDataURL('image/png');
-        const imgWidth = 210; // A4 width in mm
+        const imgWidth = 210; 
         const imgHeight = (canvas.height * imgWidth) / canvas.width;
         const pdfHeight = Math.max(imgHeight, 297);
 
@@ -86,16 +85,13 @@ const InvoicePreview = () => {
 
         pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
 
-        // Add clickable link over the "View and pay online now" text
         const linkElement = document.getElementById('payment-link');
         if (linkElement) {
             const linkRect = linkElement.getBoundingClientRect();
             const containerRect = element.getBoundingClientRect();
 
-            // Critical: Adjust coordinates back to 1:1 scale before applying mm scale
             const invScale = scale || 1;
-            const scaleFactor = imgWidth / 896; // 896 is the base desktop width
-
+            const scaleFactor = imgWidth / 896;
             const linkX = ((linkRect.left - containerRect.left) / invScale) * scaleFactor;
             const linkY = ((linkRect.top - containerRect.top) / invScale) * scaleFactor;
             const linkW = (linkRect.width / invScale) * scaleFactor;
@@ -140,7 +136,6 @@ const InvoicePreview = () => {
     return (
         <Layout>
             <div className="space-y-8 pb-32 no-print-bg">
-                {/* Sticky Header */}
                 <div className="sticky top-16 z-40 -mx- px-4 py-4 bg-surface-100/80 backdrop-blur-xl border-b border-outline mb-8 flex items-center justify-between no-print overflow-hidden">
                     <div className="flex items-center space-x-3 md:space-x-4 min-w-0">
                         <button onClick={() => navigate('/')} className="p-2.5 md:p-3 bg-surface-200 border border-outline hover:bg-surface-300 rounded-2xl transition-all flex-shrink-0">
@@ -163,7 +158,6 @@ const InvoicePreview = () => {
                     </div>
                 </div>
 
-                {/* Desktop-only layout wrapper - now scaled for perfect mobile fit */}
                 <div className="overflow-x-hidden no-print flex justify-center">
                     <div
                         id="scaling-container"
@@ -182,9 +176,7 @@ const InvoicePreview = () => {
                             animate={{ opacity: 1, y: 0 }}
                             className="w-[896px] mx-auto printable-content bg-white text-black p-12 pb-24 shadow-2xl relative min-h-[1400px] font-sans"
                         >
-                            {/* Main Layout Grid */}
                             <div className="grid grid-cols-2 gap-12 mb-24">
-                                {/* Top Left */}
                                 <div className="space-y-12">
                                     <h1 className="text-5xl font-light tracking-tight text-black">INVOICE</h1>
                                     <div className="pl-32 space-y-0.5">
@@ -196,13 +188,11 @@ const InvoicePreview = () => {
                                     </div>
                                 </div>
 
-                                {/* Top Right */}
                                 <div className="text-right">
                                     <div className="flex justify-end mb-8">
                                         <img src={iTek} alt="iTEK SOLUTIONS" className="h-16 w-auto" />
                                     </div>
 
-                                    {/* Meta Info beside the address block */}
                                     <div className="flex justify-end space-x-12 mb-8">
                                         <div className="text-left text-[10px] space-y-4">
                                             <div>
@@ -231,7 +221,6 @@ const InvoicePreview = () => {
                                 </div>
                             </div>
 
-                            {/* Table */}
                             <table className="w-full mb-16">
                                 <thead>
                                     <tr className="border-b border-black text-xs font-bold text-slate-900">
@@ -253,7 +242,6 @@ const InvoicePreview = () => {
                                 </tbody>
                             </table>
 
-                            {/* Totals Section */}
                             <div className="flex justify-end p-2 border-t border-slate-700 mb-20">
                                 <div className="w-64 flex justify-between items-center text-xs font-bold">
                                     <span className="uppercase tracking-widest text-slate-900">TOTAL AUD</span>
@@ -261,7 +249,6 @@ const InvoicePreview = () => {
                                 </div>
                             </div>
 
-                            {/* Bottom Payment Grid */}
                             <div className="grid grid-cols-2 gap-16 text-[11px] text-slate-600 font-medium pb-80
                             ">
                                 <div className="space-y-6">
@@ -295,7 +282,6 @@ const InvoicePreview = () => {
                                 </div>
                             </div>
 
-                            {/* Payment Advice Slip */}
                             <div className="absolute bottom-10 left-12 right-12">
                                 <div className="border-t-2 border-dashed border-slate-900 pt-4 relative">
                                     <div className="absolute -top-3 left-0 text-xl  no-print">

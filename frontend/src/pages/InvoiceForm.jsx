@@ -89,7 +89,6 @@ const InvoiceForm = () => {
                 [section]: { ...prev[section], [field]: value }
             }));
 
-            // Auto-fill Client Details if name matches
             if (field === 'name' && section === 'customerDetails') {
                 const existingClient = clients.find(c => c.name.toLowerCase() === value.toLowerCase());
                 if (existingClient) {
@@ -108,7 +107,6 @@ const InvoiceForm = () => {
         } else {
             const updates = { [field]: value };
 
-            // Auto-update Due Date when Invoice Date changes
             if (field === 'invoiceDate') {
                 const date = new Date(value);
                 date.setDate(date.getDate() + 7);
@@ -196,7 +194,6 @@ const InvoiceForm = () => {
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-8">
-                        {/* General Info */}
                         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-surface-200 border border-outline p-8 rounded-[2rem] space-y-8">
                             <div className="flex items-center space-x-3 text-primary">
                                 <FileText className="h-5 w-5" />
@@ -257,7 +254,6 @@ const InvoiceForm = () => {
                             </div>
                         </motion.div>
 
-                        {/* Line Items */}
                         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-surface-200 border border-outline rounded-[2rem] overflow-hidden">
                             <div className="px-8 py-6 border-b border-outline flex justify-between items-center bg-surface-300/30">
                                 <div className="flex items-center space-x-3 text-primary">
@@ -346,7 +342,6 @@ const InvoiceForm = () => {
                     </div>
 
                     <div className="space-y-8">
-                        {/* Customer Details */}
                         <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="bg-surface-200 border border-outline p-8 rounded-[2rem] space-y-8">
                             <div className="flex items-center space-x-3 text-primary">
                                 <User className="h-5 w-5" />
@@ -413,7 +408,6 @@ const InvoiceForm = () => {
                             </div>
                         </motion.div>
 
-                        {/* Payment Info */}
                         <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="bg-surface-200 border border-outline p-8 rounded-[2rem] space-y-8">
                             <div className="flex items-center space-x-3 text-primary">
                                 <Banknote className="h-5 w-5" />

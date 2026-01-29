@@ -15,7 +15,6 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Database connection logic
 let isConnected = false;
 
 async function connectDB() {
@@ -33,7 +32,6 @@ async function connectDB() {
   }
 }
 
-// Middleware to ensure DB is connected before handling routes
 app.use(async (req, res, next) => {
   try {
     await connectDB();
@@ -59,7 +57,6 @@ app.get('/', (req, res) => {
   res.send('Invoice Management System API');
 });
 
-// Catch-all route for any unhandled paths to confirm Express is reachable
 app.use((req, res) => {
   res.status(404).json({
     message: `Path not found on Express: ${req.path}`,
