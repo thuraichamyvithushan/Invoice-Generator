@@ -8,6 +8,7 @@ import { Download, ArrowLeft, Loader2, Scissors } from 'lucide-react';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
 import { formatCurrency } from '../utils/utils';
+import { useAuth } from '../context/AuthContext';
 import iTek from "../assets/logo/iteks.png"
 import visa from "../assets/icons/visa.svg";
 import mastercard from "../assets/icons/mastercard.svg";
@@ -15,6 +16,7 @@ import amex from "../assets/icons/american-express.svg";
 
 const InvoicePreview = () => {
     const { id } = useParams();
+    const { user } = useAuth();
     const navigate = useNavigate();
     const [invoice, setInvoice] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -58,7 +60,7 @@ const InvoicePreview = () => {
         const element = invoiceRef.current;
         const canvas = await html2canvas(element, {
             scale: 2,
-            useCORS: true, 
+            useCORS: true,
             logging: false,
             backgroundColor: '#ffffff',
             windowWidth: 896,
@@ -73,7 +75,7 @@ const InvoicePreview = () => {
         });
 
         const imgData = canvas.toDataURL('image/png');
-        const imgWidth = 210; 
+        const imgWidth = 210;
         const imgHeight = (canvas.height * imgWidth) / canvas.width;
         const pdfHeight = Math.max(imgHeight, 297);
 
@@ -206,8 +208,14 @@ const InvoicePreview = () => {
 
                                             <div>
                                                 <p className="font-bold text-slate-800">ABN</p>
-                                                <p className="text-slate-500">{invoice.companyDetails?.abn || '96 678 973 085'}</p>
+                                                <p className="text-slate-500">{user?.companyProfile?.abn || invoice.companyDetails?.abn || '96 678 973 085'}</p>
                                             </div>
+                                            {(invoice.companyDetails?.acn || user?.companyProfile?.acn) && (
+                                                <div>
+                                                    <p className="font-bold text-slate-800">ACN</p>
+                                                    <p className="text-slate-500">{user?.companyProfile?.acn || invoice.companyDetails?.acn}</p>
+                                                </div>
+                                            )}
                                         </div>
 
                                         <div className="text-left text-[11px] text-slate-600 leading-relaxed font-medium">

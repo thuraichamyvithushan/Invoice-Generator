@@ -20,6 +20,7 @@ const Profile = () => {
         email: '',
         website: '',
         abn: '',
+        acn: '',
         bankName: '',
         accountName: '',
         accountNumber: '',
@@ -35,6 +36,7 @@ const Profile = () => {
                 email: user.companyProfile.email || '',
                 website: user.companyProfile.website || '',
                 abn: user.companyProfile.abn || '',
+                acn: user.companyProfile.acn || '',
                 bankName: user.companyProfile.bankName || '',
                 accountName: user.companyProfile.accountName || '',
                 accountNumber: user.companyProfile.accountNumber || '',
@@ -74,6 +76,7 @@ const Profile = () => {
                 { name: 'email', type: 'text', placeholder: 'Business Email', icon: Globe },
                 { name: 'website', type: 'text', placeholder: 'Website (Optional)', icon: Globe },
                 { name: 'abn', type: 'text', placeholder: 'ABN', icon: Hash },
+                { name: 'acn', type: 'text', placeholder: 'ACN', icon: Hash },
                 { name: 'address', type: 'textarea', placeholder: 'Full Address', icon: MapPin },
             ]
         },

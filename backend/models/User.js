@@ -25,7 +25,8 @@ const userSchema = new mongoose.Schema({
         accountName: String,
         accountNumber: String,
         bsb: String,
-        abn: String
+        abn: String,
+        acn: String
     },
     resetPasswordToken: String,
     resetPasswordExpires: Date

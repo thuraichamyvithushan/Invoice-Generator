@@ -49,6 +49,7 @@ const InvoiceForm = () => {
                         email: user.companyProfile?.email || user.email,
                         website: user.companyProfile?.website || '',
                         abn: user.companyProfile?.abn || '',
+                        acn: user.companyProfile?.acn || '',
                         AmountEnclosed: user.companyDetails?.AmountEnclosed || ''
                     },
                     paymentInstructions: {
