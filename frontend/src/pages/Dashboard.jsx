@@ -266,9 +266,9 @@ const Dashboard = () => {
                                                     </button>
                                                 </div>
                                                 <div className="flex gap-3">
-                                                    <button onClick={() => handleDownload(invoice._id, invoice.invoiceNumber)} className="p-3 bg-surface-300 rounded-xl text-slate-400 hover:text-white transition-colors" title="Download">
+                                                    {/* <button onClick={() => handleDownload(invoice._id, invoice.invoiceNumber)} className="p-3 bg-surface-300 rounded-xl text-slate-400 hover:text-white transition-colors" title="Download">
                                                         <Download className="h-4 w-4" />
-                                                    </button>
+                                                    </button> */}
                                                     <Link to={`/invoices/view/${invoice._id}`} className="inline-flex items-center px-6 py-3 bg-primary text-white text-xs font-black rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-primary/20" title="Preview">
                                                         <Eye className="h-4 w-4 mr-2" />
                                                         VIEW
